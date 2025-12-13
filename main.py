@@ -27,8 +27,8 @@ def main():
     algorithm = KEARL_Framework(
         factory=factory,
         jobs=jobs,
-        pop_size=50,       
-        max_gen=50,        
+        pop_size=100,       
+        max_gen=100,        
         vns_enabled=True,
         energy_strategy_enabled=True
     )
@@ -36,8 +36,6 @@ def main():
     # 4. Chạy thuật toán
     print("-> Bắt đầu chạy thuật toán...")
     
-    # [QUAN TRỌNG] Hứng 2 giá trị trả về: (Mặt trận Pareto cuối, Cá thể tốt nhất lịch sử)
-    # Lưu ý: Bạn phải sửa kearl_framework.py như hướng dẫn ở trên thì dòng này mới chạy
     final_pareto_front, historical_best = algorithm.run() 
 
     # Ưu tiên lấy historical_best (kết quả tốt nhất từng tìm thấy)
