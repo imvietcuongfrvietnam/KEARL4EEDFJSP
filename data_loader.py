@@ -40,9 +40,11 @@ class DataLoader:
 
         # 3. Parse Header
         try:
-            first_line = list(map(int, lines_pt[0].split()))
-            num_jobs = first_line[0]
-            num_machines = first_line[1]
+            tokens = lines_pt[0].strip().split()
+
+            # Chỉ lấy 2 phần tử đầu tiên và ép kiểu int
+            num_jobs = int(tokens[0])
+            num_machines = int(tokens[1])
         except Exception as e:
             raise ValueError(f"Lỗi đọc dòng đầu file .fjs: {e}")
 
@@ -70,8 +72,6 @@ class DataLoader:
             if i + 1 >= len(lines_pt): break
             line_pt_vals = list(map(float, lines_pt[i+1].split()))
             
-            # File ST không header (dựa theo ảnh của bạn) -> dòng dữ liệu là i
-            # Nếu file ST CÓ header giống file PT, bạn đổi thành lines_st[i+1]
             line_st_vals = []
             if i < len(lines_st):
                 line_st_vals = list(map(float, lines_st[i].split()))
@@ -81,8 +81,6 @@ class DataLoader:
             total_ops = int(line_pt_vals[0])
             ptr = 1 # Bỏ qua số lượng Ops ở đầu
             
-            # Logic pointer cho file Setup Time
-            # Dựa vào ảnh a10101.png, dòng ST cũng có số Ops ở đầu -> ptr_st cũng start=1
             ptr_st = 1 
             
             for j in range(total_ops):

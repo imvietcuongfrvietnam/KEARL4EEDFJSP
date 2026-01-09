@@ -122,13 +122,12 @@ class EnergyEfficientScheduler:
                 min_time_sum = time_sum
                 best_m_idx = idx
 
-        # Nếu tìm được máy tốt hơn (hoặc khác máy cũ mà có time tốt)
         if best_m_idx != -1:
             new_ind = copy.deepcopy(individual)
             # Cập nhật Gen MS
             gene_idx = new_ind.op_to_index_map[(op_obj.job_id, op_obj.op_id)]
             new_ind.ms[gene_idx] = best_m_idx
-            new_ind.decode() # Tính lại để xem kết quả
+            new_ind.decode() 
             return new_ind
         
         return individual
@@ -143,9 +142,6 @@ class EnergyEfficientScheduler:
 
         op_obj = last_op_node['op']
         
-        # Cần xác định vị trí máy trước đó để tính Transport Energy
-        # Truy xuất từ individual.detailed_schedule hơi khó, ta lấy từ job_prev_machine logic
-        # Cách đơn giản: Giả sử prev_machine là nơi operation trước đó của Job này thực hiện
         prev_m_id = None
         if op_obj.op_id > 0:
             # Tìm op trước

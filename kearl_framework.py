@@ -20,6 +20,9 @@ class KEARL_Framework:
         self.vns_enabled = vns_enabled
         self.es_enabled = energy_strategy_enabled
         
+        # [NEW] 1. Khởi tạo list lưu lịch sử hội tụ
+        self.convergence_history = [] 
+        
         # Modules placeholder
         self.rl_agent = None 
         self.vns = None      
@@ -33,7 +36,7 @@ class KEARL_Framework:
         self.vns = VariableNeighborhoodSearch(self.factory)
         self.es_scheduler = EnergyEfficientScheduler(self.factory)
         self.rl_agent = RLAgent(max_generations=self.max_gen)
-
+        
         # 2. Population Initialization
         print(f"Initializing Population (Size: {self.pop_size})...")
         population = init_module.generate_population()
@@ -45,7 +48,7 @@ class KEARL_Framework:
         # Init RL State
         current_state = self.rl_agent.get_state(population, 1)
 
-        # [NEW] Khởi tạo biến lưu trữ Global Best (Tốt nhất lịch sử)
+        # Khởi tạo biến lưu trữ Global Best (Tốt nhất lịch sử)
         self.global_best_solution = None
         self.global_min_makespan = float('inf')
 
@@ -116,9 +119,14 @@ class KEARL_Framework:
             # --- 8. Selection (NSGA-II) ---
             population = NSGAII_Utils.select_survivors(combined_pop, self.pop_size)
             
-            # [NEW] Cập nhật Global Best sau mỗi thế hệ
+            # --- [NEW] CẬP NHẬT BEST VÀ LỊCH SỬ HỘI TỤ ---
+            # Tìm cá thể tốt nhất trong thế hệ hiện tại (theo Makespan)
             current_gen_best = min(population, key=lambda x: x.makespan)
             
+            # 1. Lưu vào lịch sử để vẽ biểu đồ
+            self.convergence_history.append(current_gen_best.makespan)
+            
+            # 2. Cập nhật Global Best (Best ever)
             if current_gen_best.makespan < self.global_min_makespan:
                 self.global_min_makespan = current_gen_best.makespan
                 # Dùng deepcopy để lưu bản cứng, tránh bị biến đổi ở gen sau
@@ -133,5 +141,5 @@ class KEARL_Framework:
         print("=== END ===")
         final_fronts = NSGAII_Utils.fast_non_dominated_sort(population)
         
-        # [MODIFIED] Trả về 2 giá trị: (Pareto Front cuối cùng, Best Lịch sử)
+        # Trả về 2 giá trị: (Pareto Front cuối cùng, Best Lịch sử)
         return final_fronts[0], self.global_best_solution
